@@ -16,6 +16,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 /**
  *
@@ -42,6 +43,22 @@ public class ProdutoServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         try {
+
+            String categoria = (String) req.getParameter("categoria");
+            
+            String descricao = (String) req.getParameter("descricao");
+            String detalhes = (String) req.getParameter("detalhes");
+            
+            String valorParam = req.getParameter("valor");
+            int valor = (int) Util.stringFormatadaParaFloat(valorParam);
+
+            HttpSession sessao = req.getSession();
+            req.setAttribute("categoria", categoria);
+            req.setAttribute("descricao", descricao);
+            req.setAttribute("detalhes", detalhes);
+            req.setAttribute("valor", valor);
+
+            
             String idParam = req.getParameter("id");
             int id = Util.stringParaInt(idParam);
             String erro = validaFormulario(req, resp);
@@ -96,29 +113,29 @@ public class ProdutoServlet extends HttpServlet {
 
     private String validaFormulario(HttpServletRequest req, HttpServletResponse resp) {
         String erro = "";
-        
+
         int categoriaParam = Util.stringParaInt(req.getParameter("categoria"));
         if (categoriaParam == 0) {
             erro += "Selecione uma categoria!<br />";
         }
-        
+
         String descricaoParam = req.getParameter("descricao");
         if (!ValidacaoUtil.validaString(descricaoParam, 3)) {
             erro += "Necessário uma descrição com mais de três caracteres!<br />";
         } else if (!ValidacaoUtil.validaStringMaximo(descricaoParam, 50)) {
             erro += "Campo Descrição superior a 50 caracteres!<br />";
         }
-        
+
         String detalhesParam = req.getParameter("detalhes");
         if (!ValidacaoUtil.validaStringMaximo(detalhesParam, 1000)) {
             erro += "Campo Detalhes superior a 1000 caracteres!<br />";
         }
-        
+
         float valorParam = Util.stringFormatadaParaFloat(req.getParameter("valor"));
         if (!ValidacaoUtil.validaNumeroNegativo(valorParam)) {
             erro += "Valor negativo!<br />";
         }
-        
+
         return erro;
     }
 }
